@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { Box, Home, Menu, X } from 'lucide-react'
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false)
+  const handleAuthClick =  async () => {
+
+  }
 
   return (
     <>
@@ -17,6 +19,17 @@ export default function Navbar() {
               Roomify
             </span>
           </div>
+          <ul className='links'>
+            <a href="#">Product</a>
+            <a href="#">Pricing</a>
+            <a href="#">Community</a>
+            <a href="#">Enterprises</a>
+          </ul>
+        </div>
+        <div className="actions">
+          <button onClick={handleAuthClick}>
+
+          </button>
         </div>
       </nav>
     </header>
