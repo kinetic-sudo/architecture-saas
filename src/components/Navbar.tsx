@@ -27,9 +27,14 @@ export default function Navbar() {
           </ul>
         </div>
         <div className="actions">
-          <button onClick={handleAuthClick}>
-
+          <button onClick={handleAuthClick}
+          className='login'
+          >
+            Log In
           </button>
+          <a href="#upload" className='cta'>
+            Get Started
+          </a>
         </div>
       </nav>
     </header>
