@@ -12,6 +12,7 @@
     "check": "biome check"
   },
   "dependencies": {
+    "@heyputer/puter.js": "^2.2.10",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "^0.7.0",
     "@tanstack/react-router": "^1.132.0",
