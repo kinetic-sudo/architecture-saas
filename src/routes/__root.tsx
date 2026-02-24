@@ -5,6 +5,7 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import appCss from '../styles.css?url'
 import Navbar from '../components/Navbar'
+import { useState } from 'react'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -30,7 +31,24 @@ export const Route = createRootRoute({
   shellComponent: RootDocument,
 })
 
+const DEFAULT_AUTH_STATE: AuthState = {
+  isSignedIn: false,
+  userName: null,
+  userId: null
+
+}
+
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const [authState, setAuthState] = useState<AuthState>(DEFAULT_AUTH_STATE)
+
+  const refreshAuth = () => {
+    try {
+
+    } catch {
+      
+    }
+  }
+
   return (
     <html lang="en">
       <head>
@@ -56,9 +74,4 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   )
 }
 
-const DEFAULT_AUTH_STAGE: AuthState = {
-  isSignedIn: false,
-  userName: null,
-  userId: null
 
-}
