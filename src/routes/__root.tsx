@@ -6,6 +6,8 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import appCss from '../styles.css?url'
 import Navbar from '../components/Navbar'
 import { useState } from 'react'
+import puter from '@heyputer/puter.js'
+import { getCurrentUser } from '@/lib/puter.action'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -41,11 +43,20 @@ const DEFAULT_AUTH_STATE: AuthState = {
 function RootDocument({ children }: { children: React.ReactNode }) {
   const [authState, setAuthState] = useState<AuthState>(DEFAULT_AUTH_STATE)
 
-  const refreshAuth = () => {
+  const refreshAuth = async () => {
     try {
+      const user = await getCurrentUser()
+      setAuthState({
+        isSignedIn: !!user,
+        userName: user?.username || null,
+        userId: user?.uuid || null
+      })
+
+      return !!user;
 
     } catch {
-      
+      setAuthState(DEFAULT_AUTH_STATE)
+      return false
     }
   }
 
