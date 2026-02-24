@@ -55,3 +55,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     </html>
   )
 }
+
+const DEFAULT_AUTH_STAGE: AuthState = {
+  isSignedIn: false,
+  userName: null,
+  userId: null
+
+}
