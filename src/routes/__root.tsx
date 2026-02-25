@@ -65,12 +65,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   }, [])
 
   const signIn = async () => {
-    await signIn();
+    await puterSignIn();
     return refreshAuth()
   }
 
   const signOut = async () => {
-    await signOut();
+    await puterSignOut();
     return refreshAuth()
   }
 
