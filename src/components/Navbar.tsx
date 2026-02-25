@@ -5,7 +5,16 @@ import { useAuth } from '@/routes/__root'
 export default function Navbar() {
   const { isSignedIn, userName, signIn, signOut } = useAuth()
 
-  const handleAuthClick = async () => {}
+  const handleAuthClick = async () => {
+    if(isSignedIn) {
+      try {
+        await signOut()
+      } catch (e) {
+        console.log(`puter failed to signIn user: ${e}`)
+      }
+      return ;
+    } 
+  }
 
   return (
     <header className='navbar'>
