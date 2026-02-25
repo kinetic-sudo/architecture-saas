@@ -1,4 +1,4 @@
-import { Box, Home, Menu, X } from 'lucide-react'
+import { Box } from 'lucide-react'
 import { Button } from './ui/button'
 
 export default function Navbar() {

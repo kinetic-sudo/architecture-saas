@@ -1,13 +1,7 @@
-import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-
-
+import { HeadContent, createRootRoute, Outlet } from '@tanstack/react-router'
 import appCss from '../styles.css?url'
-import Navbar from '../components/Navbar'
-import { useEffect, useState } from 'react'
-import puter from '@heyputer/puter.js'
-import { getCurrentUser, signIn as puterSignIn, signOut as puterSignOut  } from '@/lib/puter.action'
+import { createContext, useContext, useEffect, useState } from 'react'
+import { getCurrentUser, signIn as puterSignIn, signOut as puterSignOut } from '@/lib/puter.action'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -33,6 +27,18 @@ export const Route = createRootRoute({
   shellComponent: RootDocument,
 })
 
+export const AuthContext = createContext<authContext | undefined>(undefined)
+
+export function useAuth() {
+  const context = useContext(AuthContext)
+
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthContext.Provider')
+  }
+
+  return context
+}
+
 const DEFAULT_AUTH_STATE: AuthState = {
   isSignedIn: false,
   userName: null,
@@ -40,7 +46,7 @@ const DEFAULT_AUTH_STATE: AuthState = {
 
 }
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootDocument() {
   const [authState, setAuthState] = useState<AuthState>(DEFAULT_AUTH_STATE)
 
   const refreshAuth = async () => {
@@ -73,16 +79,24 @@ function RootDocument({ children }: { children: React.ReactNode }) {
      puterSignOut();
     return refreshAuth()
   }
-
   return (
     <html lang="en">
       <head>
         <HeadContent />
       </head>
       <main className='min-h-screen bg-background text-foreground relative z-10'>
-        <Outlet 
-         
-        />
+        <AuthContext.Provider
+          value={{
+            isSignedIn: authState.isSignedIn,
+            userName: authState.userName,
+            userId: authState.userId,
+            refreshAuth,
+            signIn,
+            signOut,
+          }}
+        >
+          <Outlet />
+        </AuthContext.Provider>
       </main>
     </html>
   )
