@@ -5,7 +5,7 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import appCss from '../styles.css?url'
 import Navbar from '../components/Navbar'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import puter from '@heyputer/puter.js'
 import { getCurrentUser } from '@/lib/puter.action'
 
@@ -60,6 +60,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     }
   }
 
+  useEffect(() => {
+    refreshAuth()
+  }, [])
+  
   return (
     <html lang="en">
       <head>
