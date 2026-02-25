@@ -7,7 +7,7 @@ import appCss from '../styles.css?url'
 import Navbar from '../components/Navbar'
 import { useEffect, useState } from 'react'
 import puter from '@heyputer/puter.js'
-import { getCurrentUser } from '@/lib/puter.action'
+import { getCurrentUser, signIn as puterSignIn, signOut as puterSignOut  } from '@/lib/puter.action'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -63,7 +63,17 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     refreshAuth()
   }, [])
-  
+
+  const signIn = async () => {
+    await signIn();
+    return refreshAuth()
+  }
+
+  const signOut = async () => {
+    await signOut();
+    return refreshAuth()
+  }
+
   return (
     <html lang="en">
       <head>
