@@ -70,7 +70,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
-    await puterSignOut();
+     puterSignOut();
     return refreshAuth()
   }
 
