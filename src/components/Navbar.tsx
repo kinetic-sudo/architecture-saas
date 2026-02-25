@@ -1,12 +1,11 @@
 import { Box } from 'lucide-react'
 import { Button } from './ui/button'
+import { useAuth } from '@/routes/__root'
 
 export default function Navbar() {
-  const isSignedIn = false
-  const userName = 'kinetic'
-  const handleAuthClick =  async () => {
+  const { isSignedIn, userName, signIn, signOut } = useAuth()
 
-  }
+  const handleAuthClick = async () => {}
 
   return (
     <header className='navbar'>
