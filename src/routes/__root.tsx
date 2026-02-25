@@ -79,8 +79,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <main className='min-h-screen'>
-        <Outlet />
+      <main className='min-h-screen bg-background text-foreground relative z-10'>
+        <Outlet 
+         
+        />
       </main>
     </html>
   )
