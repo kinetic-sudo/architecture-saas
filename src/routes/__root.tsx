@@ -25,6 +25,14 @@ export const Route = createRootRoute({
     ],
   }),
   shellComponent: RootDocument,
+  notFoundComponent: () => (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold">Page not found</h1>
+      <p className="text-muted-foreground mt-2">
+        The page you&apos;re looking for doesn&apos;t exist.
+      </p>
+    </div>
+  ),
 })
 
 export const AuthContext = createContext<authContext | undefined>(undefined)
