@@ -12,6 +12,7 @@ export default function Navbar() {
       } catch (e) {
         console.log(`puter failed to signIn user: ${e}`)
       }
+      
       return ;
     } 
     try {
