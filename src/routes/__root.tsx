@@ -62,8 +62,8 @@ function RootDocument() {
       const user = await getCurrentUser()
       setAuthState({
         isSignedIn: !!user,
-        userName: user?.username || null,
-        userId: user?.uuid || null
+        userName: (user as any)?.name ?? (user as any)?.username ?? null,
+        userId: (user as any)?.id ?? (user as any)?.uuid ?? null,
       })
 
       return !!user;
