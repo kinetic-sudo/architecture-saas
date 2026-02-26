@@ -14,7 +14,13 @@ export default function Navbar() {
       }
       return ;
     } 
+    try {
+      await signIn()
+    } catch (e) {
+      console.log(`login failed: ${e}`)
+    }
   }
+
 
   return (
     <header className='navbar'>
