@@ -1,23 +1,40 @@
-import { Box } from 'lucide-react'
+// components/Navbar.tsx
+import { Box, Loader2 } from 'lucide-react'
 import { Button } from './ui/button'
 import { useAuth } from '@/routes/__root'
+import { useState } from 'react'
 
 export default function Navbar() {
-  const { isSignedIn, userName, signIn, signOut } = useAuth()
+  const { isSignedIn, userName, signIn, signOut, isAuthLoading } = useAuth()
+  const [isProcessing, setIsProcessing] = useState(false)
 
-  const handleAuthClick = () => {
-    if (isSignedIn) {
-      void signOut().catch((e) => {
-        console.log(`puter failed to signOut user: ${e}`)
-      })
-      return
+  const handleAuthClick = async () => {
+    setIsProcessing(true)
+    
+    try {
+      if (isSignedIn) {
+        console.log('🔄 Logging out...')
+        const success = await signOut()
+        if (success) {
+          console.log('✅ Logged out successfully')
+        }
+      } else {
+        console.log('🔄 Logging in...')
+        const success = await signIn()
+        if (success) {
+          console.log('✅ Logged in successfully')
+        } else {
+          console.log('⚠️ Login did not complete')
+        }
+      }
+    } catch (error) {
+      console.error('❌ Auth action failed:', error)
+    } finally {
+      setIsProcessing(false)
     }
-
-    void signIn().catch((e) => {
-      console.log(`login failed: ${e}`)
-    })
   }
 
+  const isLoading = isAuthLoading || isProcessing
 
   return (
     <header className='navbar'>
@@ -25,9 +42,7 @@ export default function Navbar() {
         <div className="left">
           <div className="brand">
             <Box className='logo'/>
-            <span className='name'>
-              Roomify
-            </span>
+            <span className='name'>Roomify</span>
           </div>
           <ul className='links'>
             <a href="#">Product</a>
@@ -39,26 +54,47 @@ export default function Navbar() {
         <div className="actions">
           {isSignedIn ? (
             <>
-            <span className='greeting'>
-              {userName ? `Hi, ${userName}` : 'Signed In'}
-            </span>
-            <Button size='sm' className='btn' onClick={handleAuthClick}>
-              Log out
-            </Button>
+              <span className='greeting'>
+                {userName ? `Hi, ${userName}` : 'Signed In'}
+              </span>
+              <Button 
+                size='sm' 
+                className='btn' 
+                onClick={handleAuthClick}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Logging out...
+                  </>
+                ) : (
+                  'Log out'
+                )}
+              </Button>
             </>
           ) : (
             <> 
-            <Button size='sm' onClick={handleAuthClick}
-            variant='ghost'
-            >
-              Log In
-            </Button>
-          <a href="#upload" className='cta'>
-            Get Started
-          </a>
+              <Button 
+                size='sm' 
+                onClick={handleAuthClick}
+                variant='ghost'
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Logging in...
+                  </>
+                ) : (
+                  'Log In'
+                )}
+              </Button>
+              <a href="#upload" className='cta'>
+                Get Started
+              </a>
             </>
           )}
-        
         </div>
       </nav>
     </header>
