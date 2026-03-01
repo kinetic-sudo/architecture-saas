@@ -1,4 +1,3 @@
-// routes/__root.tsx
 import { HeadContent, createRootRoute, Outlet } from '@tanstack/react-router'
 import appCss from '../styles.css?url'
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -23,13 +22,7 @@ export const Route = createRootRoute({
         href: appCss,
       },
     ],
-    scripts: [
-      // ADD PUTER SCRIPT
-      {
-        src: 'https://js.puter.com/v2/',
-        type: 'text/javascript',
-      }
-    ]
+    // REMOVE scripts property - it's causing the 401 error
   }),
   shellComponent: RootDocument,
   notFoundComponent: () => (
@@ -70,17 +63,64 @@ function RootDocument() {
   const [isAuthLoading, setIsAuthLoading] = useState(false)
   const [puterReady, setPuterReady] = useState(false)
 
-  // Wait for Puter to load
+  // Load Puter script dynamically
   useEffect(() => {
-    const checkPuter = setInterval(() => {
-      if (window.puter) {
-        console.log('✅ Puter loaded:', window.puter)
-        setPuterReady(true)
-        clearInterval(checkPuter)
-      }
-    }, 100)
+    console.log('📦 Loading Puter script...')
+    
+    // Check if already loaded
+    if (window.puter) {
+      console.log('✅ Puter already loaded')
+      setPuterReady(true)
+      return
+    }
 
-    return () => clearInterval(checkPuter)
+    // Check if script already exists
+    const existingScript = document.querySelector('script[src="https://js.puter.com/v2/"]')
+    if (existingScript) {
+      console.log('⏳ Puter script already in DOM, waiting...')
+      // Wait for it to load
+      const checkInterval = setInterval(() => {
+        if (window.puter) {
+          console.log('✅ Puter loaded from existing script')
+          setPuterReady(true)
+          clearInterval(checkInterval)
+        }
+      }, 100)
+      return () => clearInterval(checkInterval)
+    }
+
+    // Create and inject script
+    const script = document.createElement('script')
+    script.src = 'https://js.puter.com/v2/'
+    script.async = true
+    
+    script.onload = () => {
+      console.log('✅ Puter script loaded successfully')
+      // Wait a bit for Puter to initialize
+      setTimeout(() => {
+        if (window.puter) {
+          console.log('✅ Puter object available:', window.puter)
+          setPuterReady(true)
+        } else {
+          console.error('❌ Puter loaded but window.puter not found')
+        }
+      }, 100)
+    }
+    
+    script.onerror = (error) => {
+      console.error('❌ Failed to load Puter script:', error)
+    }
+    
+    document.head.appendChild(script)
+    console.log('📝 Puter script injected into DOM')
+
+    // Cleanup
+    return () => {
+      const scriptToRemove = document.querySelector('script[src="https://js.puter.com/v2/"]')
+      if (scriptToRemove) {
+        document.head.removeChild(scriptToRemove)
+      }
+    }
   }, [])
 
   const refreshAuth = async () => {
@@ -91,7 +131,10 @@ function RootDocument() {
 
     try {
       // Use isSignedIn() first to check
-      if (!window.puter.auth.isSignedIn()) {
+      const isSignedIn = window.puter.auth.isSignedIn()
+      console.log('🔍 isSignedIn():', isSignedIn)
+      
+      if (!isSignedIn) {
         console.log('ℹ️ User not signed in')
         setAuthState(DEFAULT_AUTH_STATE)
         return false
@@ -112,7 +155,7 @@ function RootDocument() {
         return false
       }
     } catch (error) {
-      console.error('Error refreshing auth:', error)
+      console.error('❌ Error refreshing auth:', error)
       setAuthState(DEFAULT_AUTH_STATE)
       return false
     }
@@ -129,23 +172,34 @@ function RootDocument() {
   const signIn = async () => {
     if (!window.puter) {
       console.error('❌ Puter not loaded')
+      alert('Puter is not loaded yet. Please wait and try again.')
       return false
     }
 
     setIsAuthLoading(true)
     try {
       console.log('🔐 Starting Puter sign in...')
+      console.log('📞 Calling window.puter.auth.signIn()...')
       
       // Call signIn - it will open a popup
       const result = await window.puter.auth.signIn()
       console.log('✅ Puter sign in result:', result)
       
+      // Wait a moment for session to be established
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
       // Refresh auth state
       const success = await refreshAuth()
       console.log('🔄 Auth refresh result:', success)
+      
+      if (success) {
+        alert('Successfully signed in!')
+      }
+      
       return success
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Sign in error:', error)
+      alert(`Sign in failed: ${error.message || 'Unknown error'}`)
       return false
     } finally {
       setIsAuthLoading(false)
@@ -165,9 +219,11 @@ function RootDocument() {
       console.log('✅ Puter sign out successful')
       
       setAuthState(DEFAULT_AUTH_STATE)
+      alert('Successfully signed out!')
       return true
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Sign out error:', error)
+      alert(`Sign out failed: ${error.message || 'Unknown error'}`)
       return false
     } finally {
       setIsAuthLoading(false)
@@ -184,10 +240,17 @@ function RootDocument() {
       <body>
         <main className='min-h-screen bg-background text-foreground relative z-10'>
           {!puterReady && (
-            <div className="fixed top-4 left-4 bg-yellow-100 border border-yellow-300 px-4 py-2 rounded text-sm">
-              Loading Puter...
+            <div className="fixed top-4 left-4 bg-yellow-100 border border-yellow-300 px-4 py-2 rounded text-sm z-50">
+              ⏳ Loading Puter...
             </div>
           )}
+          
+          {puterReady && (
+            <div className="fixed top-4 left-4 bg-green-100 border border-green-300 px-4 py-2 rounded text-sm z-50">
+              ✅ Puter Ready
+            </div>
+          )}
+          
           <AuthContext.Provider
             value={{
               isSignedIn: authState.isSignedIn,
