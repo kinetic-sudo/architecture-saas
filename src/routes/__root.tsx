@@ -40,13 +40,20 @@ function RootDocument() {
   const [isAuthLoading, setIsAuthLoading] = useState(false)
   const [puterReady, setPuterReady] = useState(false)
 
-  // No dynamic script injection needed — puter is imported directly
   useEffect(() => {
-    if (puter) {
-      console.log('✅ Puter ready via npm package')
-      setPuterReady(true)
-      refreshAuth()
+    // Puter loads synchronously via index.html script tag
+    // By the time React runs, window.puter is already available
+    const checkPuter = () => {
+      if (window.puter?.auth) {
+        console.log('✅ Puter ready:', window.puter)
+        setPuterReady(true)
+        refreshAuth()
+      } else {
+        console.log('⏳ Waiting for puter...')
+        setTimeout(checkPuter, 100)
+      }
     }
+    checkPuter()
   }, [])
 
   const refreshAuth = async (): Promise<boolean> => {
@@ -91,7 +98,7 @@ function RootDocument() {
   const signOut = async (): Promise<boolean> => {
     setIsAuthLoading(true)
     try {
-      await puter.auth.signOut()
+       puter.auth.signOut()
       setAuthState(DEFAULT_AUTH_STATE)
       return true
     } catch (error: any) {
