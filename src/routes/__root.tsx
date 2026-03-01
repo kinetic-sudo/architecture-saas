@@ -2,7 +2,6 @@
 import { HeadContent, createRootRoute, Outlet } from '@tanstack/react-router'
 import appCss from '../styles.css?url'
 import { createContext, useContext, useEffect, useState } from 'react'
-import { getCurrentUser, signIn as puterSignIn, signOut as puterSignOut } from '@/lib/puter.action'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -24,6 +23,13 @@ export const Route = createRootRoute({
         href: appCss,
       },
     ],
+    scripts: [
+      // ADD PUTER SCRIPT
+      {
+        src: 'https://js.puter.com/v2/',
+        type: 'text/javascript',
+      }
+    ]
   }),
   shellComponent: RootDocument,
   notFoundComponent: () => (
@@ -52,19 +58,53 @@ const DEFAULT_AUTH_STATE: AuthState = {
   userId: null
 }
 
+// Declare puter on window
+declare global {
+  interface Window {
+    puter: any
+  }
+}
+
 function RootDocument() {
   const [authState, setAuthState] = useState<AuthState>(DEFAULT_AUTH_STATE)
   const [isAuthLoading, setIsAuthLoading] = useState(false)
+  const [puterReady, setPuterReady] = useState(false)
+
+  // Wait for Puter to load
+  useEffect(() => {
+    const checkPuter = setInterval(() => {
+      if (window.puter) {
+        console.log('✅ Puter loaded:', window.puter)
+        setPuterReady(true)
+        clearInterval(checkPuter)
+      }
+    }, 100)
+
+    return () => clearInterval(checkPuter)
+  }, [])
 
   const refreshAuth = async () => {
+    if (!window.puter) {
+      console.log('⚠️ Puter not ready yet')
+      return false
+    }
+
     try {
-      const user = await getCurrentUser()
+      // Use isSignedIn() first to check
+      if (!window.puter.auth.isSignedIn()) {
+        console.log('ℹ️ User not signed in')
+        setAuthState(DEFAULT_AUTH_STATE)
+        return false
+      }
+
+      const user = await window.puter.auth.getUser()
+      console.log('👤 Got user:', user)
       
       if (user) {
         setAuthState({
           isSignedIn: true,
-          userName: (user as any)?.username || (user as any)?.email || 'User',
-          userId: (user as any)?.uuid || (user as any)?.id || null,
+          userName: user.username || user.email || 'User',
+          userId: user.uuid || user.id || null,
         })
         return true
       } else {
@@ -78,21 +118,29 @@ function RootDocument() {
     }
   }
 
-  // Check auth on mount
+  // Check auth when Puter is ready
   useEffect(() => {
-    refreshAuth()
-  }, [])
+    if (puterReady) {
+      console.log('🔄 Puter ready, checking auth...')
+      refreshAuth()
+    }
+  }, [puterReady])
 
   const signIn = async () => {
+    if (!window.puter) {
+      console.error('❌ Puter not loaded')
+      return false
+    }
+
     setIsAuthLoading(true)
     try {
       console.log('🔐 Starting Puter sign in...')
-      await puterSignIn()
-      console.log('✅ Puter sign in successful')
       
-      // Wait a bit for Puter to set up the session
-      await new Promise(resolve => setTimeout(resolve, 500))
+      // Call signIn - it will open a popup
+      const result = await window.puter.auth.signIn()
+      console.log('✅ Puter sign in result:', result)
       
+      // Refresh auth state
       const success = await refreshAuth()
       console.log('🔄 Auth refresh result:', success)
       return success
@@ -105,10 +153,15 @@ function RootDocument() {
   }
 
   const signOut = async () => {
+    if (!window.puter) {
+      console.error('❌ Puter not loaded')
+      return false
+    }
+
     setIsAuthLoading(true)
     try {
       console.log('🚪 Starting Puter sign out...')
-      await puterSignOut()
+      await window.puter.auth.signOut()
       console.log('✅ Puter sign out successful')
       
       setAuthState(DEFAULT_AUTH_STATE)
@@ -121,6 +174,8 @@ function RootDocument() {
     }
   }
 
+  console.log('🎨 Rendering with:', { puterReady, authState })
+
   return (
     <html lang="en">
       <head>
@@ -128,6 +183,11 @@ function RootDocument() {
       </head>
       <body>
         <main className='min-h-screen bg-background text-foreground relative z-10'>
+          {!puterReady && (
+            <div className="fixed top-4 left-4 bg-yellow-100 border border-yellow-300 px-4 py-2 rounded text-sm">
+              Loading Puter...
+            </div>
+          )}
           <AuthContext.Provider
             value={{
               isSignedIn: authState.isSignedIn,
