@@ -1,7 +1,14 @@
 import { HeadContent, createRootRoute, Outlet } from '@tanstack/react-router'
 import appCss from '../styles.css?url'
 import { createContext, useContext, useEffect, useState } from 'react'
-import puter from '@heyputer/puter.js'  // ← Direct import
+// ❌ REMOVE: import puter from '@heyputer/puter.js'
+// Use window.puter everywhere instead
+
+const PUTER_APP_ID = 'app-77b328e5-f48f-46c4-a9fb-4927043cbc6c' // from your Dev Center
+
+declare global {
+  interface Window { puter: any }
+}
 
 export const Route = createRootRoute({
   head: () => ({
@@ -16,7 +23,6 @@ export const Route = createRootRoute({
   notFoundComponent: () => (
     <div className="p-6">
       <h1 className="text-2xl font-bold">Page not found</h1>
-      <p className="text-muted-foreground mt-2">The page you're looking for doesn't exist.</p>
     </div>
   ),
 })
@@ -41,11 +47,11 @@ function RootDocument() {
   const [puterReady, setPuterReady] = useState(false)
 
   useEffect(() => {
-    // Puter loads synchronously via index.html script tag
-    // By the time React runs, window.puter is already available
     const checkPuter = () => {
       if (window.puter?.auth) {
-        console.log('✅ Puter ready:', window.puter)
+        // ✅ Pass your App ID so Puter authorizes this origin
+        window.puter.init({ app_uid: PUTER_APP_ID })
+        console.log('✅ Puter ready with app:', PUTER_APP_ID)
         setPuterReady(true)
         refreshAuth()
       } else {
@@ -58,12 +64,14 @@ function RootDocument() {
 
   const refreshAuth = async (): Promise<boolean> => {
     try {
-      const isSignedIn = puter.auth.isSignedIn()
+      // ✅ window.puter everywhere — NOT the npm import
+      const isSignedIn = window.puter.auth.isSignedIn()
+      console.log('🔍 isSignedIn:', isSignedIn)
       if (!isSignedIn) {
         setAuthState(DEFAULT_AUTH_STATE)
         return false
       }
-      const user = await puter.auth.getUser()
+      const user = await window.puter.auth.getUser()
       if (user) {
         setAuthState({
           isSignedIn: true,
@@ -82,9 +90,15 @@ function RootDocument() {
   }
 
   const signIn = async (): Promise<boolean> => {
+    if (!puterReady) {
+      console.error('❌ Puter not ready yet')
+      return false
+    }
     setIsAuthLoading(true)
     try {
-      await puter.auth.signIn()
+      console.log('🔐 Opening Puter sign in popup...')
+      // ✅ window.puter — this opens the OAuth popup
+      await window.puter.auth.signIn()
       await new Promise(resolve => setTimeout(resolve, 500))
       return await refreshAuth()
     } catch (error: any) {
@@ -98,7 +112,8 @@ function RootDocument() {
   const signOut = async (): Promise<boolean> => {
     setIsAuthLoading(true)
     try {
-       puter.auth.signOut()
+      // ✅ window.puter
+      await window.puter.auth.signOut()
       setAuthState(DEFAULT_AUTH_STATE)
       return true
     } catch (error: any) {
@@ -116,17 +131,15 @@ function RootDocument() {
       </head>
       <body>
         <main className='min-h-screen bg-background text-foreground relative z-10'>
-          <AuthContext.Provider
-            value={{
-              isSignedIn: authState.isSignedIn,
-              userName: authState.userName,
-              userId: authState.userId,
-              isAuthLoading,
-              refreshAuth,
-              signIn,
-              signOut,
-            }}
-          >
+          <AuthContext.Provider value={{
+            isSignedIn: authState.isSignedIn,
+            userName: authState.userName,
+            userId: authState.userId,
+            isAuthLoading,
+            refreshAuth,
+            signIn,
+            signOut,
+          }}>
             <Outlet />
           </AuthContext.Provider>
         </main>
