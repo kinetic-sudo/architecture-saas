@@ -13,6 +13,10 @@ const config = defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  ssr: {
+    noExternal: ['@heyputer/puter.js'],
+  },
+
   plugins: [
     devtools(),
     TanStackRouterVite(),
