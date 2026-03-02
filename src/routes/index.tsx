@@ -12,7 +12,6 @@ function App() {
       <h1 className="text-3xl text-indigo-700 font-extrabold">
         Home
       </h1>
-      <script src="https://js.puter.com/v2/"></script>
     </div>
   )
 }
