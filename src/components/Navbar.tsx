@@ -13,11 +13,7 @@ export default function Navbar() {
     
     try {
       if (isSignedIn) {
-        console.log('🔄 Logging out...')
-        const success = await signOut()
-        if (success) {
-          console.log('✅ Logged out successfully')
-        }
+       await signOut()
       } else {
         console.log('🔄 Logging in...')
         const success = await signIn()
