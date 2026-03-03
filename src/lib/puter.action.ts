@@ -5,7 +5,7 @@ export const signIn = async () => {
 }
 
 export const signOut = async () => {
-  await puter.auth.signOut()
+   puter.auth.signOut()
   return true
 }
 
