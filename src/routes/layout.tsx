@@ -1,7 +1,6 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
-import type { Route } from './+types/layout'
 
-export const links: Route.LinksFunction = () => [
+export const links = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
   {
     rel: 'preconnect',
@@ -38,7 +37,7 @@ export default function App() {
   return <Outlet />
 }
 
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+export function ErrorBoundary({ error }: { error: unknown }) {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-red-600">Something went wrong</h1>
