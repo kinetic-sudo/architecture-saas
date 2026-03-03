@@ -1,7 +1,6 @@
-import type { Route } from '../routes/layout'
 import Navbar from '../components/Navbar'
 
-export function meta({}: Route.MetaArgs) {
+export function meta(){
   return [
     { title: 'Roomify - Your Space Manager' },
     { name: 'description', content: 'Manage your spaces with Roomify' },
