@@ -1,7 +1,7 @@
 // components/Navbar.tsx
 import { Box, Loader2 } from 'lucide-react'
 import { Button } from './ui/button'
-import { useAuth } from '@/routes/App'
+import { useAuth } from '../routes/app'
 import { useState } from 'react'
 
 export default function Navbar() {
