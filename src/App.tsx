@@ -1,9 +1,5 @@
-import { Routes, Route } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
 import { createContext, useContext, useEffect, useState } from 'react'
-import Navbar from '@/components/Navbar'
-// import HomePage from '@/pages/HomePage' // your existing page
-
-// ─── Types ───────────────────────────────────────────────────────────────────
 
 interface AuthState {
   isSignedIn: boolean
@@ -25,8 +21,6 @@ declare global {
   interface Window { puter: any }
 }
 
-// ─── Auth Context ─────────────────────────────────────────────────────────────
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function useAuth() {
@@ -37,13 +31,10 @@ export function useAuth() {
 
 const DEFAULT: AuthState = { isSignedIn: false, userName: null, userId: null }
 
-// ─── Auth Provider ────────────────────────────────────────────────────────────
-
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authState, setAuthState] = useState<AuthState>(DEFAULT)
   const [isAuthLoading, setIsAuthLoading] = useState(false)
 
-  // window.puter is already available — loaded by index.html script tag
   const p = () => window.puter
 
   const refreshAuth = async (): Promise<boolean> => {
@@ -63,34 +54,31 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       setAuthState(DEFAULT)
       return false
     } catch (e) {
-      console.error('refreshAuth error:', e)
       setAuthState(DEFAULT)
       return false
     }
   }
 
   useEffect(() => {
-    // puter is on window already — just check auth state on mount
-    const check = async () => {
+    setTimeout(() => {
       if (!window.puter?.auth) {
-        console.error('❌ window.puter not found — check index.html script tag')
+        console.error('❌ window.puter not found')
         return
       }
       console.log('✅ window.puter ready')
-      await refreshAuth()
-    }
-    check()
+      refreshAuth()
+    }, 300)
   }, [])
 
   const signIn = async (): Promise<boolean> => {
+    if (!p()?.auth) return false
     setIsAuthLoading(true)
     try {
-      console.log('🔐 puter.auth.signIn()...')
       await p().auth.signIn()
-      await new Promise(r => setTimeout(r, 500))
+      await new Promise(r => setTimeout(r, 800))
       return await refreshAuth()
     } catch (e: any) {
-      console.error('signIn error:', e)
+      console.log('signIn cancelled:', e?.message)
       return false
     } finally {
       setIsAuthLoading(false)
@@ -104,7 +92,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       setAuthState(DEFAULT)
       return true
     } catch (e: any) {
-      console.error('signOut error:', e)
       return false
     } finally {
       setIsAuthLoading(false)
@@ -120,16 +107,10 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
-// ─── App ──────────────────────────────────────────────────────────────────────
-
 export default function App() {
   return (
     <AuthProvider>
-      <Navbar />
-      <Routes>
-        {/* <Route path="/" element={<HomePage />} /> */}
-        {/* add more routes here */}
-      </Routes>
+      <Outlet />
     </AuthProvider>
   )
 }
