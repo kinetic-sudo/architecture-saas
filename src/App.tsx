@@ -1,5 +1,7 @@
-import { Outlet } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { createContext, useContext, useEffect, useState } from 'react'
+import { Layout } from '@/routes/layout'
+import Home from '@/routes/home'
 
 interface AuthState {
   isSignedIn: boolean
@@ -110,7 +112,11 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <AuthProvider>
-      <Outlet />
+      <Layout>  {/* ← wrap everything in Layout */}
+        <Routes>
+          <Route path="/" element={<Home />} />
+        </Routes>
+      </Layout>
     </AuthProvider>
   )
 }
