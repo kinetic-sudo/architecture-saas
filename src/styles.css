@@ -511,10 +511,15 @@
                 }
 
                 .projects-grid {
-                    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8;
-
+                    @apply flex flex-wrap justify-center gap-8;
+                
                     .project-card {
-                        @apply relative bg-white rounded-xl overflow-hidden border border-zinc-200 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col h-full;
+                        @apply relative bg-white rounded-xl overflow-hidden border border-zinc-200 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col;
+                        width: calc(33.333% - 1.5rem); /* 3-column width */
+                        min-width: 280px;
+                
+                
+                        
 
                         .preview {
                             @apply aspect-4/3 overflow-hidden bg-zinc-100 relative;

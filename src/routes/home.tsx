@@ -62,12 +62,32 @@ export default function Home() {
           </div>
         </div>
         <div className="projects-grid">
-          <div className="project-card group">
-           <div className="preview">
-            <img src="" alt="" />
-           </div>
-          </div>
-        </div>
+                          <div  className="project-card group">
+                              <div className="preview">
+                                  <img  src='https://roomify-mlhuk267-dfwu1i.puter.site/projects/1770803585402/rendered.png' alt="Project"
+                                  />
+
+                                  {/* <div className="badge">
+                                      <span>Community</span>
+                                  </div> */}
+                              </div>
+
+                              {/* <div className="card-body">
+                                  <div>
+                                      <h3>{name}</h3>
+
+                                      <div className="meta">
+                                          <Clock size={12} />
+                                          <span>{new Date(timestamp).toLocaleDateString()}</span>
+                                          <span>By JS Mastery</span>
+                                      </div>
+                                  </div>
+                                  <div className="arrow">
+                                      <ArrowUpRight size={18} />
+                                  </div>
+                              </div> */}
+                          </div>
+                  </div>
       </div>
      </section>
     </div>
