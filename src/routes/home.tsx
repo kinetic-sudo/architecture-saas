@@ -13,6 +13,7 @@ export default function Home() {
   return (
     <div className="home">
       <Navbar />
+      {/* Hero Section */}
      <section className='hero'>
       <div className="announce">
         <div className="dot">
@@ -50,6 +51,10 @@ export default function Home() {
               <p>Upload images</p>
             </div>
         </div>
+     </section>
+     {/* Features Section */}
+     <section>
+      
      </section>
     </div>
   )
