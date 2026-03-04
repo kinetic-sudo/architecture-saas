@@ -63,7 +63,9 @@ export default function Home() {
         </div>
         <div className="projects-grid">
           <div className="project-card group">
-            
+           <div className="preview">
+            <img src="" alt="" />
+           </div>
           </div>
         </div>
       </div>
