@@ -40,6 +40,12 @@ export default function Home() {
                 <div className="upload-icon">
                   <Layers className='icon' />
                 </div>
+                <h3>
+                  Upload your floor plan
+                </h3>
+                <p>
+                  Support JPEG, PNG, formats upto 10MB.
+                </p>
               </div>
             </div>
         </div>
