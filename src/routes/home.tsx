@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Layers } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import { Button } from '@/components/ui/button'
 
@@ -32,6 +32,16 @@ export default function Home() {
           <Button variant='outline' size='lg' className='demo'>
             Watch Demo
           </Button>
+        </div>
+        <div className="upload-shell" id='upload'>
+          <div className="grid-overlay" />
+          <div className="upload-card">
+              <div className="upload-head">
+                <div className="upload-icon">
+                  <Layers className='icon' />
+                </div>
+              </div>
+            </div>
         </div>
      </section>
     </div>
