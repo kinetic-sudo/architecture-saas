@@ -53,8 +53,20 @@ export default function Home() {
         </div>
      </section>
      {/* Features Section */}
-     <section>
-      
+     <section className='projects'>
+      <div className="section-inner">
+        <div className="section-head">
+          <div className="copy">
+            <h2>Projects</h2>
+            <p>Your latest work and shared comunity projects all in one place</p>
+          </div>
+        </div>
+        <div className="projects-grid">
+          <div className="project-card group">
+            
+          </div>
+        </div>
+      </div>
      </section>
     </div>
   )
