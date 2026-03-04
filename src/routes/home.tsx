@@ -53,18 +53,18 @@ export default function Home() {
         </div>
      </section>
      {/* Features Section */}
-     <section className='projects'>
-      <div className="section-inner">
-        <div className="section-head">
-          <div className="copy">
-            <h2>Projects</h2>
-            <p>Your latest work and shared comunity projects all in one place</p>
-          </div>
-        </div>
+     <section className="projects">
+              <div className="section-inner">
+                  <div className="section-head">
+                      <div className="copy">
+                          <h2>Projects</h2>
+                          <p>Your latest work and shared community projects, all in one place.</p>
+                      </div>
+                  </div>
         <div className="projects-grid">
                           <div  className="project-card group">
                               <div className="preview">
-                                  <img  src='https://roomify-mlhuk267-dfwu1i.puter.site/projects/1770803585402/rendered.png' alt="Project"
+                                  <img  src='https://roomify-mlhuk267-dfwu1i.puter.site/projects/1770803585402/rendered.png' alt="Project" 
                                   />
 
                                   {/* <div className="badge">
