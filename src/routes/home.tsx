@@ -1,4 +1,4 @@
-import { ArrowRight, Layers } from 'lucide-react'
+import { ArrowRight, Clock, Layers } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import { Button } from '@/components/ui/button'
 
@@ -75,6 +75,14 @@ export default function Home() {
                              <div className="card-body">
                               <div>
                                 <h3>Project Manhattan</h3>
+                                <div className="meta">
+                                  <Clock size={12}/>
+                                  <span>{new Date('06/3/2027').toLocaleDateString()}</span>
+                                  <span>By kinetic (Aka Pratyush)</span>
+                                </div>
+                              </div>
+                              <div className="arrow">
+                                
                               </div>
                              </div>
                           </div>
