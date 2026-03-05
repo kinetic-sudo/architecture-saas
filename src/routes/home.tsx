@@ -1,6 +1,7 @@
 import { ArrowRight, ArrowUpRight, Clock, Layers } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import { Button } from '@/components/ui/button'
+import Upload from '@/components/upload'
 
 export function meta(){
   return [
@@ -48,7 +49,7 @@ export default function Home() {
                   Support JPEG, PNG, formats upto 10MB.
                 </p>
               </div>
-              <p>Upload images</p>
+              <Upload />
             </div>
         </div>
      </section>
