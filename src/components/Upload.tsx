@@ -1,8 +1,13 @@
-import React from 'react'
+import React,{useState} from 'react'
 
 const Upload = () => {
+
+    const [file, setFile] = useState(null)
+
   return (
-    <div>Upload</div>
+    <div className='upload'>
+
+    </div>
   )
 }
 
