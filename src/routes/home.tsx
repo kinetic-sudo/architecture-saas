@@ -1,4 +1,4 @@
-import { ArrowRight, Clock, Layers } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Clock, Layers } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import { Button } from '@/components/ui/button'
 
@@ -82,7 +82,7 @@ export default function Home() {
                                 </div>
                               </div>
                               <div className="arrow">
-                                
+                                <ArrowUpRight size={18} />
                               </div>
                              </div>
                           </div>
