@@ -1,4 +1,5 @@
 import { useAuth } from '@/App'
+import { UploadIcon } from 'lucide-react'
 import React,{useState} from 'react'
 
 const Upload = () => {
@@ -18,8 +19,17 @@ const Upload = () => {
                 accept='.jpg,.jpeg,.png' 
                 disabled={!isSignedIn}
                 />
-                <div className=''>
-
+                <div className='drop-content'>
+                    <div className="drop-icon">
+                        <UploadIcon size={20} />
+                    </div>
+                    <p>
+                        {isSignedIn ? (
+                            "Click to upload or just drag and drop"
+                        ) : (
+                            "Sign in or sign up with puter to upload"
+                        )}
+                    </p>
                 </div>
             </div>
         ) : (
