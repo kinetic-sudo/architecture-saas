@@ -12,8 +12,15 @@ const Upload = () => {
   return (
     <div className='upload'>
         {!file ? (
-            <div>
-                No file
+            <div className={`dropzone ${isDragging ? "is-dragging" : ""}`}>
+                <input type="file" 
+                className='drop-input' 
+                accept='.jpg,.jpeg,.png' 
+                disabled={!isSignedIn}
+                />
+                <div className=''>
+
+                </div>
             </div>
         ) : (
             <div>
