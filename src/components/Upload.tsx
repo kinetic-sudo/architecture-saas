@@ -30,11 +30,14 @@ const Upload = () => {
                             "Sign in or sign up with puter to upload"
                         )}
                     </p>
+                    <p className='help'>Maximum file size 50 MB</p>
                 </div>
             </div>
         ) : (
-            <div>
-                File
+            <div className='upload-status'>
+                <div className="status-content">
+                    
+                </div>
             </div>
         )}
     </div>
