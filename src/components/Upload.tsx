@@ -1,5 +1,5 @@
 import { useAuth } from '@/App'
-import { UploadIcon } from 'lucide-react'
+import { CheckCircle2, ImageIcon, UploadIcon } from 'lucide-react'
 import React,{useState} from 'react'
 
 const Upload = () => {
@@ -36,7 +36,24 @@ const Upload = () => {
         ) : (
             <div className='upload-status'>
                 <div className="status-content">
-                    
+                    <div className="status-icon">
+                        {progress === 100 ? ( 
+                            <CheckCircle2 className='check' />
+
+                        ) : (
+                            <ImageIcon className='image'/>
+                        )}
+                    </div>
+
+                    <h3>{file.name}</h3>
+
+                    <div className="progress">
+                        <div className="bar" style={{width: `${progress}%`}} />
+
+                        <p className='status-text'>
+                            {progress < 100 ? 'Ananlyzing floor...' : 'Redircting...'}
+                        </p>
+                    </div>
                 </div>
             </div>
         )}
