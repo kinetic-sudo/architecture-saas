@@ -50,7 +50,9 @@ const Upload = () => {
                     <div className="progress">
                         <div className="bar" style={{width: `${progress}%`}} />
 
-                        <p className='status-text'></p>
+                        <p className='status-text'>
+                            {progress < 100 ? 'Ananlyzing floor...' : 'Redircting...'}
+                        </p>
                     </div>
                 </div>
             </div>
