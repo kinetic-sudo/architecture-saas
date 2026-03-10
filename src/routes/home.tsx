@@ -1,7 +1,9 @@
 import { ArrowRight, ArrowUpRight, Clock, Layers } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import { Button } from '@/components/ui/button'
-import Upload from '@/components/upload'
+import Upload from '@/components/Upload'
+import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 
 export function meta(){
   return [
@@ -10,7 +12,24 @@ export function meta(){
   ]
 }
 
+const UPLOAD_BASE64_STORAGE_KEY = 'roomify:last-upload-base64'
+const UPLOAD_FILENAME_STORAGE_KEY = 'roomify:last-upload-filename'
+
 export default function Home() {
+  const navigate = useNavigate()
+
+  // Clear any stale upload data so the Upload component doesn't
+  // rehydrate and immediately redirect away from the homepage.
+  useEffect(() => {
+    window.sessionStorage.removeItem(UPLOAD_BASE64_STORAGE_KEY)
+    window.sessionStorage.removeItem(UPLOAD_FILENAME_STORAGE_KEY)
+  }, [])
+
+  const handleUploadOnComplete = (base64Image: string) => {
+    const newId = Date.now().toString()
+    navigate(`/visualizer/${newId}`, { state: { base64Image } })
+  }
+
   return (
     <div className="home">
       <Navbar />
@@ -31,7 +50,7 @@ export default function Home() {
           <a href="/upload" className='cta'>
             Start Building <ArrowRight className='icon' />
           </a>
-          <Button variant='outline' size='lg' className='demo'>
+          <Button variant='secondary' size='lg' className='demo'>
             Watch Demo
           </Button>
         </div>
@@ -49,7 +68,7 @@ export default function Home() {
                   Support JPEG, PNG, formats upto 10MB.
                 </p>
               </div>
-              <Upload/>
+              <Upload onComplete={handleUploadOnComplete}  />
             </div>
         </div>
      </section>
@@ -63,16 +82,13 @@ export default function Home() {
                       </div>
                   </div>
         <div className="projects-grid">
-                          <div  className="project-card group">
+                          <div className="project-card group">
                               <div className="preview">
-                                  <img  src='https://roomify-mlhuk267-dfwu1i.puter.site/projects/1770803585402/rendered.png' alt="Project" 
-                                  />
-
+                                  <img src='https://roomify-mlhuk267-dfwu1i.puter.site/projects/1770803585402/rendered.png' alt="Project" />
                                   <div className="badge">
                                     <span>Community</span>
                                   </div>
                               </div>
-
                              <div className="card-body">
                               <div>
                                 <h3>Project Manhattan</h3>

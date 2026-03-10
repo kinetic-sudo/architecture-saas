@@ -3,10 +3,11 @@ import { PROGRESS_INTERVAL_MS, PROGRESS_STEP, REDIRECT_DELAY_MS } from '@/lib/co
 import { CheckCircle2, ImageIcon, UploadIcon } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 
+const UPLOAD_BASE64_STORAGE_KEY = 'roomify:last-upload-base64'
+
 type UploadProps = {
   onComplete?: (data: string) => void
 }
-
 
 const Upload: React.FC<UploadProps> = ({ onComplete }) => {
   const [file, setFile] = useState<File | null>(null)
@@ -24,10 +25,20 @@ const Upload: React.FC<UploadProps> = ({ onComplete }) => {
   }
 
   useEffect(() => {
+    // Rehydrate any previously uploaded Base64 data on refresh/reload
+    try {
+      const stored = window.sessionStorage.getItem(UPLOAD_BASE64_STORAGE_KEY)
+      if (stored && onComplete) {
+        onComplete(stored)
+      }
+    } catch {
+      // ignore storage errors
+    }
+
     return () => {
       clearProgressInterval()
     }
-  }, [])
+  }, [onComplete])
 
   const processFile = (selectedFile: File) => {
     if (!isSignedIn) return
@@ -44,8 +55,12 @@ const Upload: React.FC<UploadProps> = ({ onComplete }) => {
       const result = reader.result
       const base64 = result.includes('base64,') ? result.split('base64,')[1] : result
 
-      console.log('upload document:', base64)
-
+      // Persist Base64 so it survives page refresh/reload
+      try {
+        window.sessionStorage.setItem(UPLOAD_BASE64_STORAGE_KEY, base64)
+      } catch {
+        // ignore storage errors
+      }
 
       let currentProgress = 0
 
