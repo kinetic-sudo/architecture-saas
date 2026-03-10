@@ -7,6 +7,7 @@ type UploadProps = {
   onComplete?: (data: string) => void
 }
 
+
 const Upload: React.FC<UploadProps> = ({ onComplete }) => {
   const [file, setFile] = useState<File | null>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -42,6 +43,9 @@ const Upload: React.FC<UploadProps> = ({ onComplete }) => {
 
       const result = reader.result
       const base64 = result.includes('base64,') ? result.split('base64,')[1] : result
+
+      console.log('upload document:', base64)
+
 
       let currentProgress = 0
 
