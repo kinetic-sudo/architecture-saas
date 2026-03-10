@@ -1,23 +1,20 @@
 import { useAuth } from '@/App'
 import { PROGRESS_INTERVAL_MS, PROGRESS_STEP, REDIRECT_DELAY_MS } from '@/lib/constants'
-import { CheckCircle2, ImageIcon, Trash2, UploadIcon } from 'lucide-react'
+import { CheckCircle2, ImageIcon, UploadIcon } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 
 const UPLOAD_BASE64_STORAGE_KEY = 'roomify:last-upload-base64'
-const UPLOAD_FILENAME_STORAGE_KEY = 'roomify:last-upload-filename'
 
 type UploadProps = {
   onComplete?: (data: string) => void
-  onRemove?: () => void
 }
 
-const Upload: React.FC<UploadProps> = ({ onComplete, onRemove }) => {
+const Upload: React.FC<UploadProps> = ({ onComplete }) => {
   const [file, setFile] = useState<File | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [progress, setProgress] = useState(0)
 
   const intervalRef = useRef<number | null>(null)
-  const hasRehydrated = useRef(false)
   const { isSignedIn } = useAuth()
 
   const clearProgressInterval = () => {
@@ -28,23 +25,11 @@ const Upload: React.FC<UploadProps> = ({ onComplete, onRemove }) => {
   }
 
   useEffect(() => {
-    if (hasRehydrated.current) return
-    hasRehydrated.current = true
-
+    // Rehydrate any previously uploaded Base64 data on refresh/reload
     try {
       const stored = window.sessionStorage.getItem(UPLOAD_BASE64_STORAGE_KEY)
-      const storedName = window.sessionStorage.getItem(UPLOAD_FILENAME_STORAGE_KEY)
-
-      if (stored) {
-        const restoredFile = new File([], storedName ?? 'Previous upload', {
-          type: 'image/jpeg',
-        })
-        setFile(restoredFile)
-        setProgress(100)
-
-        if (onComplete) {
-          onComplete(stored)
-        }
+      if (stored && onComplete) {
+        onComplete(stored)
       }
     } catch {
       // ignore storage errors
@@ -53,24 +38,7 @@ const Upload: React.FC<UploadProps> = ({ onComplete, onRemove }) => {
     return () => {
       clearProgressInterval()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // Clears the uploaded file from state and sessionStorage
-  const handleRemoveFile = () => {
-    clearProgressInterval()
-    setFile(null)
-    setProgress(0)
-
-    try {
-      window.sessionStorage.removeItem(UPLOAD_BASE64_STORAGE_KEY)
-      window.sessionStorage.removeItem(UPLOAD_FILENAME_STORAGE_KEY)
-    } catch {
-      // ignore storage errors
-    }
-
-    onRemove?.()
-  }
+  }, [onComplete])
 
   const processFile = (selectedFile: File) => {
     if (!isSignedIn) return
@@ -87,9 +55,9 @@ const Upload: React.FC<UploadProps> = ({ onComplete, onRemove }) => {
       const result = reader.result
       const base64 = result.includes('base64,') ? result.split('base64,')[1] : result
 
+      // Persist Base64 so it survives page refresh/reload
       try {
         window.sessionStorage.setItem(UPLOAD_BASE64_STORAGE_KEY, base64)
-        window.sessionStorage.setItem(UPLOAD_FILENAME_STORAGE_KEY, selectedFile.name)
       } catch {
         // ignore storage errors
       }
@@ -118,7 +86,9 @@ const Upload: React.FC<UploadProps> = ({ onComplete, onRemove }) => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!isSignedIn) return
     const selectedFile = event.target.files?.[0]
-    if (selectedFile) processFile(selectedFile)
+    if (selectedFile) {
+      processFile(selectedFile)
+    }
   }
 
   const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
@@ -145,7 +115,9 @@ const Upload: React.FC<UploadProps> = ({ onComplete, onRemove }) => {
     setIsDragging(false)
 
     const droppedFile = event.dataTransfer.files?.[0]
-    if (droppedFile) processFile(droppedFile)
+    if (droppedFile) {
+      processFile(droppedFile)
+    }
   }
 
   return (
@@ -188,22 +160,11 @@ const Upload: React.FC<UploadProps> = ({ onComplete, onRemove }) => {
 
             <div className="progress">
               <div className="bar" style={{ width: `${progress}%` }} />
+
               <p className="status-text">
-                {progress < 100 ? 'Analyzing floor...' : 'Redirecting...'}
+                {progress < 100 ? 'Ananlyzing floor...' : 'Redircting...'}
               </p>
             </div>
-
-            {/* Remove button — only shown once upload is complete */}
-            {progress === 100 && (
-              <button
-                className="remove-file"
-                onClick={handleRemoveFile}
-                title="Remove uploaded file"
-              >
-                <Trash2 size={14} />
-                Remove
-              </button>
-            )}
           </div>
         </div>
       )}
