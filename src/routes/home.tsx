@@ -1,7 +1,8 @@
 import { ArrowRight, ArrowUpRight, Clock, Layers } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import { Button } from '@/components/ui/button'
-import Upload from '@/components/upload'
+import Upload from '@/components/Upload'
+import { useNavigate } from 'react-router-dom'
 
 export function meta(){
   return [
@@ -10,7 +11,20 @@ export function meta(){
   ]
 }
 
+
 export default function Home() {
+
+  const navigate = useNavigate();
+
+  const handleUploadOnComplete = async(base64Image: string) => {
+    const newId = Date.now().toString
+    
+    navigate(`/visualizer/${newId}`);
+
+    return true;
+  } 
+
+
   return (
     <div className="home">
       <Navbar />
@@ -31,7 +45,7 @@ export default function Home() {
           <a href="/upload" className='cta'>
             Start Building <ArrowRight className='icon' />
           </a>
-          <Button variant='outline' size='lg' className='demo'>
+          <Button variant='secondary' size='lg' className='demo'>
             Watch Demo
           </Button>
         </div>
@@ -49,7 +63,7 @@ export default function Home() {
                   Support JPEG, PNG, formats upto 10MB.
                 </p>
               </div>
-              <Upload/>
+              <Upload onComplete={handleUploadOnComplete} onRemove={() => {}}/>
             </div>
         </div>
      </section>
