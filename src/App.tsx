@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { Layout } from '@/routes/layout'
 import Home from '@/routes/home'
+import Visualizer from '@/routes/visualizer.$id'
 
 interface AuthState {
   isSignedIn: boolean
@@ -115,6 +116,7 @@ export default function App() {
       <Layout>  {/* ← wrap everything in Layout */}
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/visualizer/:id" element={<Visualizer />} />
         </Routes>
       </Layout>
     </AuthProvider>
