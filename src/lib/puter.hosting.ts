@@ -11,4 +11,22 @@ export const getOrCreateHostingConfig = async(): Promise<HostingConfig | null> =
     return { subdomain: existing.subdomain }
 
     const subdomain = createHostingSlug()
+
+    try {
+
+        const created = await puter.hosting.create(subdomain, '.')
+
+        const record = { subdomain: created.subdomain }
+
+        return record;
+
+    } catch (e) {
+        console.warn(`Could not find subdomain: ${e}`);
+        return null
+    }
 }
+
+export const UploadImageToHosting = async({hosting, url, projectId, label} :
+ StoreHostedImageParams) : Promise<HostedAsset | null> => {
+
+ }
