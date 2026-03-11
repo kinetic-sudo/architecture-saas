@@ -12,3 +12,8 @@ export const signOut = async () => {
 export const getCurrentUser = async () => {
   return await puter.auth.getUser()
 }
+
+export const createProject = async ({item} : CreateProjectPrams ) :
+ Promise<DesignItem | null | undefined> => {
+
+} 
