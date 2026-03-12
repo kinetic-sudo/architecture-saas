@@ -1,4 +1,6 @@
 import { puter } from '@heyputer/puter.js'  // ✅ named export
+import { getOrCreateHostingConfig, UploadImageToHosting } from './puter.hosting'
+import { isHostedUrl } from './util'
 
 export const signIn = async () => {
   return await puter.auth.signIn()
@@ -13,7 +15,31 @@ export const getCurrentUser = async () => {
   return await puter.auth.getUser()
 }
 
-export const createProject = async ({item} : CreateProjectPrams ) :
+export const createProject = async ({item} : CreateProjectParams ) :
  Promise<DesignItem | null | undefined> => {
+  const projectId = item.id
 
+  const hosting = await getOrCreateHostingConfig()
+
+  const hostedSource = projectId ? await UploadImageToHosting({
+    hosting, url: item.sourceImage, projectId, label: 'source'
+  }) : null
+
+  const hostedRender = projectId && item.renderedImage ? await UploadImageToHosting({
+    hosting, url: item.renderedImage, projectId, label: 'rendered'
+  }) : null
+
+  const resolvedSource = hostedSource?.url || (isHostedUrl(item.sourceImage) ? 
+   item.sourceImage : '')
+
+   if (!resolvedSource) {
+    console.warn('failed to load source image, skipping save.')
+    return null
+   }
+
+  const resolvedRender = hostedRender?.url 
+  ? hostedRender?.url
+  : item.renderedImage && isHostedUrl(item.renderedImage) 
+  ? item.renderedImage
+  : undefined
 } 
