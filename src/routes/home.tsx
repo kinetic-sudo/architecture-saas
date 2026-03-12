@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar'
 import { Button } from '@/components/ui/button'
 import Upload from '@/components/Upload'
 import { useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export function meta(){
   return [
@@ -17,6 +17,7 @@ const UPLOAD_FILENAME_STORAGE_KEY = 'roomify:last-upload-filename'
 
 export default function Home() {
   const navigate = useNavigate()
+  const [project, setProject] = useState<DesignItem[]>([])
 
   // Clear any stale upload data so the Upload component doesn't
   // rehydrate and immediately redirect away from the homepage.
@@ -27,6 +28,10 @@ export default function Home() {
 
   const handleUploadOnComplete = (base64Image: string) => {
     const newId = Date.now().toString()
+    const name = `Residence ${newId}`
+    const newItem = {
+      id: newId, name, sourceImage: base64Image, renderedImage: undefined
+    }
     navigate(`/visualizer/${newId}`, { state: { base64Image } })
   }
 
