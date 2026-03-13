@@ -37,7 +37,21 @@ export default function Home() {
 
     const saved = await createProject({ item: newItem, visibility: 'private' })
 
-    navigate(`/visualizer/${newId}`, { state: { base64Image } })
+    if(!saved) {
+      console.error('failed to create project')
+      return false
+    } 
+
+    setProject((prev) => [newItem, ...prev])
+
+    navigate(`/visualizer/${newId}`,  {
+      state: {
+       initialImage: saved.sourceImage,
+       initialRendered: saved.renderedImage || null,
+       name
+      }
+    }
+    )
   }
 
   return (
@@ -92,19 +106,20 @@ export default function Home() {
                       </div>
                   </div>
         <div className="projects-grid">
+          {project.map(({id, name, renderedImage, sourceImage, timestamp}) => (
                           <div className="project-card group">
                               <div className="preview">
-                                  <img src='https://roomify-mlhuk267-dfwu1i.puter.site/projects/1770803585402/rendered.png' alt="Project" />
+                                  <img src={renderedImage || sourceImage} alt="Project" />
                                   <div className="badge">
                                     <span>Community</span>
                                   </div>
                               </div>
                              <div className="card-body">
                               <div>
-                                <h3>Project Manhattan</h3>
+                                <h3>{name}</h3>
                                 <div className="meta">
                                   <Clock size={12}/>
-                                  <span>{new Date('06/3/2027').toLocaleDateString()}</span>
+                                  <span>{new Date(timestamp).toLocaleDateString()}</span>
                                   <span>By kinetic (Aka Pratyush)</span>
                                 </div>
                               </div>
@@ -113,6 +128,7 @@ export default function Home() {
                               </div>
                              </div>
                           </div>
+          ))}
                   </div>
       </div>
      </section>

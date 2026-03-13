@@ -1,59 +1,48 @@
-import puter from "@heyputer/puter.js";
-import { createHostingSlug, fetchBlobFromUrl, getHostedUrl, getImageExtension, HOSTING_CONFIG_KEY, imageUrlToPngBlob, isHostedUrl } from "./util";
-import { blob } from "stream/consumers";
+// ✅ No npm import — use window.puter CDN global
+import { createHostingSlug, fetchBlobFromUrl, getHostedUrl, getImageExtension, HOSTING_CONFIG_KEY, imageUrlToPngBlob, isHostedUrl } from './util'
 
-export const getOrCreateHostingConfig = async(): Promise<HostingConfig | null> => {
-    const existing = (await puter.kv.get(HOSTING_CONFIG_KEY)) as HostingConfig | null
+const p = () => window.puter
 
-    if(existing?.subdomain) 
-    return { subdomain: existing.subdomain }
+export const getOrCreateHostingConfig = async (): Promise<HostingConfig | null> => {
+  const existing = (await p().kv.get(HOSTING_CONFIG_KEY)) as HostingConfig | null
+  if (existing?.subdomain) return { subdomain: existing.subdomain }
 
-    const subdomain = createHostingSlug()
-
-    try {
-
-        const created = await puter.hosting.create(subdomain, '.')
-
-        const record = { subdomain: created.subdomain }
-
-        return record;
-
-    } catch (e) {
-        console.warn(`Could not find subdomain: ${e}`);
-        return null
-    }
+  const subdomain = createHostingSlug()
+  try {
+    const created = await p().hosting.create(subdomain, '.')
+    return { subdomain: created.subdomain }
+  } catch (e) {
+    console.warn(`Could not create hosting: ${e}`)
+    return null
+  }
 }
 
-export const UploadImageToHosting = async({hosting, url, projectId, label} :
- StoreHostedImageParams) : Promise<HostedAsset | null> => {
-    if(!hosting || !url) return null
-    if(isHostedUrl(url)) return { url }
+export const UploadImageToHosting = async ({ hosting, url, projectId, label }:
+  StoreHostedImageParams): Promise<HostedAsset | null> => {
+  if (!hosting || !url) return null
+  if (isHostedUrl(url)) return { url }
 
-    try {
-        const resolved = label === 'rendered' ? 
-        await imageUrlToPngBlob(url).then((blob) => blob ? { blob, 
-        contentType: 'image/png' } : null)
-        : await fetchBlobFromUrl(url)
+  try {
+    const resolved = label === 'rendered'
+      ? await imageUrlToPngBlob(url).then(blob => blob ? { blob, contentType: 'image/png' } : null)
+      : await fetchBlobFromUrl(url)
 
-        if(!resolved) return null
+    if (!resolved) return null
 
-        const contentType = resolved.contentType || resolved.blob.type || ''
-        const ext = getImageExtension(contentType, url)
-        const dir = `projects/${projectId}`
-        const filePath = `${dir}/${label}.${ext}`;
+    const contentType = resolved.contentType || resolved.blob.type || ''
+    const ext = getImageExtension(contentType, url)
+    const dir = `projects/${projectId}`
+    const filePath = `${dir}/${label}.${ext}`
 
-        const uploadFile = new File([resolved.blob], `${label}.${ext}`, {
-            type: contentType
-        })
+    const uploadFile = new File([resolved.blob], `${label}.${ext}`, { type: contentType })
 
-        await puter.fs.mkdir(dir, {createMissingParents: true});
-        await puter.fs.write(filePath, uploadFile,)
+    await p().fs.mkdir(dir, { createMissingParents: true })
+    await p().fs.write(filePath, uploadFile)
 
-        const HostedUrl = getHostedUrl({ subdomain: hosting.subdomain }, filePath)
-
-        return HostedUrl ? { url: HostedUrl } : null
-    } catch (e) {
-        console.warn(`could not find hosted url: ${e}`)
-        return null
-    }
- }
+    const hostedUrl = getHostedUrl({ subdomain: hosting.subdomain }, filePath)
+    return hostedUrl ? { url: hostedUrl } : null
+  } catch (e) {
+    console.warn(`Could not upload to hosting: ${e}`)
+    return null
+  }
+}
