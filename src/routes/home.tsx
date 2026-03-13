@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import Upload from '@/components/Upload'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { createProject } from '@/lib/puter.action'
 
 export function meta(){
   return [
@@ -26,12 +27,16 @@ export default function Home() {
     window.sessionStorage.removeItem(UPLOAD_FILENAME_STORAGE_KEY)
   }, [])
 
-  const handleUploadOnComplete = (base64Image: string) => {
+  const handleUploadOnComplete = async (base64Image: string) => {
     const newId = Date.now().toString()
     const name = `Residence ${newId}`
     const newItem = {
-      id: newId, name, sourceImage: base64Image, renderedImage: undefined
+      id: newId, name, sourceImage: base64Image, renderedImage: undefined,
+      timestamp: Date.now()
     }
+
+    const saved = await createProject({ item: newItem, visibility: 'private' })
+
     navigate(`/visualizer/${newId}`, { state: { base64Image } })
   }
 
