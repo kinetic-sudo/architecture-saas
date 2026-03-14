@@ -1,14 +1,24 @@
-import { useParams } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 
-export default function Visualizer() {
-  const { id } = useParams<{ id: string }>()
+const VisualizerId = () => {
+  const location = useLocation()
+  const { initialImage, name } = location.state || {}
+
+  
 
   return (
-    <div className="visualizer-page">
-      <h1>Visualizer</h1>
-      <p>
-        Showing visualization for id: <strong>{id}</strong>
-      </p>
-    </div>
+    <section >
+      <h1>{name || 'Untitled Project'}</h1>
+      <div className="visualizer">
+        {initialImage && (
+            <div className='image-container'>
+                <h2>Source Image</h2>
+                <img src={initialImage} alt="source" />
+            </div>
+        )}
+      </div>
+    </section>
   )
 }
+
+export default VisualizerId
