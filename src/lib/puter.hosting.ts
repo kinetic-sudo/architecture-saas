@@ -13,7 +13,7 @@ import {
       const subdomain = createHostingSlug()
       const created = await p().hosting.create(subdomain, '.')
       const record = { subdomain: created.subdomain }
-      await p().kv.set(HOSTING_CONFIG_KEY, JSON.stringify(record))
+      await p().kv.set(HOSTING_CONFIG_KEY, record)
       return record
     } catch (e) {
       console.warn('Could not create hosting config:', e)
