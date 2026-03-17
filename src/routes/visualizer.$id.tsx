@@ -1,31 +1,41 @@
 import { generate3DView } from '@/lib/ai.action'
 import { useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { Box, Download, RefreshCcw, Share2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const VisualizerId = () => {
+  const { id } = useParams()
   const navigate = useNavigate()
-  const location = useLocation()
-  const { initialImage, initialRender, name } = location.state || {}
+  const { userId } = useOutletContext<AuthContext>()
 
   const hasIntialGenerated = useRef(false)
+  const [project, setProject] = useState< DesignItem | null >(null)
+  const [isProjectLoading, setIsProjectLoading] = useState(true)
+
   const [isProcessing, setIsProcessing] = useState(false)
-  const [currentImage, setCurrentImage] = useState<string | null>(initialRender || null)
+  const [currentImage, setCurrentImage] = useState<string | null>(null)
 
   const handleBack = () => navigate('/')
 
-  const runGeneration = async () => {
-    if (!initialImage) return;
+  const runGeneration = async (item: DesignItem) => {
+    if (!id || !item.sourceImage ) return;
 
     try {
         setIsProcessing(true)
-        const result = await generate3DView({sourceImage: initialImage})
+        const result = await generate3DView({sourceImage: item.sourceImage})
 
         if(result.renderedImage) {
             setCurrentImage(result.renderedImage)
             
-            // update the project to the database with rendered Image.
+           const updatedItem = {
+              ...item,
+              renderedImage: result.renderedImage,
+              renderedPath: result.renderedPath,
+              timeStamp: Date.now(),
+              ownerID: item.ownerId ?? userId ?? null,
+              isPublic: item.isPublic ?? false
+           }
         }
     } catch (error) {
         console.error('generation failed:', error)
