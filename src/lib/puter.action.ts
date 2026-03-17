@@ -39,9 +39,11 @@ export const createProject = async ({ item, visibility = "private" }: CreateProj
       renderedImage: hostedRender?.url ?? undefined,
     }
 
-    const response = p().workers.exec(`${PUTER_WORKER_URL}/api/projects/save`, {
+    const response = await p().workers.exec(`${PUTER_WORKER_URL}/api/projects/save`, {
       method: 'POST',
-      header: {'Content-Type': 'application/json', body: JSON.stringify({
+      headers: {
+        'Content-Type': 'application/json', 
+        body: JSON.stringify({
         project: payload, visibility
       })}
     });
@@ -70,7 +72,7 @@ export const getProjects = async() => {
   }
   
       try {
-        const response = p().workers.exec(`${PUTER_WORKER_URL}/api/projects/list`, {
+        const response = await p().workers.exec(`${PUTER_WORKER_URL}/api/projects/list`, {
           method: 'GET'
         })
 

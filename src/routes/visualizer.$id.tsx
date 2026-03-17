@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { Box, Download, RefreshCcw, Share2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { timeStamp } from 'console'
 
 const VisualizerId = () => {
   const { id } = useParams()
