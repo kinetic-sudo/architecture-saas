@@ -27,8 +27,8 @@ const VisualizerId = () => {
             
             // update the project to the database with rendered Image.
         }
-    } catch (e) {
-        console.log(`generation failed: ${e}`)
+    } catch (error) {
+        console.error('generation failed:', error)
     } finally {
         setIsProcessing(false)
     }
