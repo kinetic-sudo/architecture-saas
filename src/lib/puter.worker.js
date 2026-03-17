@@ -29,7 +29,7 @@ router.post('/api/projects/save', async({ request, user }) => {
         const body = await request.json();
         const project = body?.project;
 
-        if(!project?.id || project?.sourceImage) return jsonError(400, 'Project not found')
+        if(!project?.id || !project?.sourceImage) return jsonError(400, 'Invalid project: missing id or sourceImage')
 
         const payload = {
             ...project,
@@ -76,9 +76,13 @@ router.get('/api/projects/list', async ({ user }) => {
             .map((e) => typeof e === 'string' ? e : (e?.key ?? e?.name ?? e?.id))
             .filter((k) => typeof k === 'string' && k.startsWith(PROJECT_PREFIX));
 
-        const projects = (await userPuter.kv.list(PROJECT_PREFIX, true))
-        .map(({value}) => ({...value, isPublic: true}))
-        return { projects };
+            const projects = await Promise.all(
+                        keys.map(async (key) => {
+                            const value = await userPuter.kv.get(key);
+                            return { ...value, isPublic: true };
+                           })
+                    );
+         return { projects };
     } catch (e) {
         return jsonError(500, 'failed to list projects', { message: e.message || 'Unknown error' });
     }
