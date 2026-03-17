@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar'
 import { Button } from '@/components/ui/button'
 import Upload from '@/components/Upload'
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createProject } from '@/lib/puter.action'
 
 export function meta(){
@@ -19,6 +19,7 @@ const UPLOAD_FILENAME_STORAGE_KEY = 'roomify:last-upload-filename'
 export default function Home() {
   const navigate = useNavigate()
   const [project, setProject] = useState<DesignItem[]>([])
+  const isCreatingProjectRef = useRef(false)
 
   // Clear any stale upload data so the Upload component doesn't
   // rehydrate and immediately redirect away from the homepage.
@@ -28,30 +29,37 @@ export default function Home() {
   }, [])
 
   const handleUploadOnComplete = async (base64Image: string) => {
-    const newId = Date.now().toString()
-    const name = `Residence ${newId}`
-    const newItem = {
-      id: newId, name, sourceImage: base64Image, renderedImage: undefined,
-      timestamp: Date.now()
-    }
+    try {
 
-    const saved = await createProject({ item: newItem, visibility: 'private' })
-
-    if(!saved) {
-      console.error('failed to create project')
-      return false
-    } 
-
-    setProject((prev) => [saved, ...prev])
-
-    navigate(`/visualizer/${newId}`,  {
-      state: {
-       initialImage: saved.sourceImage,
-       initialRendered: saved.renderedImage || null,
-       name
+      if(isCreatingProjectRef.current) return false
+      isCreatingProjectRef.current = true
+      const newId = Date.now().toString()
+      const name = `Residence ${newId}`
+      const newItem = {
+        id: newId, name, sourceImage: base64Image, renderedImage: undefined,
+        timestamp: Date.now()
       }
+  
+      const saved = await createProject({ item: newItem, visibility: 'private' })
+  
+      if(!saved) {
+        console.error('failed to create project')
+        return false
+      } 
+  
+      setProject((prev) => [saved, ...prev])
+  
+      navigate(`/visualizer/${newId}`,  {
+        state: {
+         initialImage: saved.sourceImage,
+         initialRendered: saved.renderedImage || null,
+         name
+        }
+      }); 
+      return true
+    } finally {
+      isCreatingProjectRef.current = false
     }
-    )
   }
 
   return (
