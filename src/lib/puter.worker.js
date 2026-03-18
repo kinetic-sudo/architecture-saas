@@ -118,3 +118,22 @@ router.get('/api/projects/get', async ({ request, user }) => {
     }
 })
 
+router.delete('/api/projects/delete', async ({ request, user }) => {
+    try {
+      const userPuter = user.puter
+      if (!userPuter) return jsonError(401, 'Authentication failed')
+  
+      const url = new URL(request.url)
+      const id = url.searchParams.get('id')
+      if (!id) return jsonError(400, 'Missing id')
+  
+      const key = `${PROJECT_PREFIX}${id}`
+      await userPuter.kv.del(key)
+  
+      return new Response(JSON.stringify({ deleted: true, id }), {
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      })
+    } catch (e) {
+      return jsonError(500, 'failed to delete project', { message: e.message })
+    }
+  })

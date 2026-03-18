@@ -135,3 +135,17 @@ export const getProjectById = async ({ id }: { id: string }) => {
       return null;
   }
 };
+
+export const deleteProject = async ({ id }: { id: string }): Promise<boolean> => {
+  if (!PUTER_WORKER_URL) return false
+  try {
+    const response = await p().workers.exec(
+      `${PUTER_WORKER_URL}/api/projects/delete?id=${encodeURIComponent(id)}`,
+      { method: 'DELETE' }
+    )
+    return response.ok
+  } catch (e) {
+    console.error('failed to delete project', e)
+    return false
+  }
+}
