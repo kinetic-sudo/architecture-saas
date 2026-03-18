@@ -122,6 +122,10 @@ router.delete('/api/projects/delete', async ({ request, user }) => {
     try {
       const userPuter = user.puter
       if (!userPuter) return jsonError(401, 'Authentication failed')
+
+        const userId = await getUserId(userPuter)
+        if (!userId) return jsonError(401, 'Authentication failed')
+
   
       const url = new URL(request.url)
       const id = url.searchParams.get('id')

@@ -67,9 +67,7 @@ export default function Home() {
     const fetchedProjects = async () => {
       const items = await getProjects()
   
-      // ✅ Auto-delete unrendered projects silently
-      const unrendered = items.filter(p => !p.renderedImage)
-      await Promise.all(unrendered.map(p => deleteProject({ id: p.id })))
+      
   
       // ✅ Only keep rendered ones
       const rendered = items.filter(p => !!p.renderedImage)
@@ -140,7 +138,7 @@ export default function Home() {
     <div className="preview">
       <img src={renderedImage || sourceImage} alt="Project" />
       <div className="badge">
-        <span>{renderedImage ? 'Community' : 'Processing'}</span>  {/* ✅ better badge */}
+      <span>Community</span>
       </div>
     </div>
     <div className="card-body">
