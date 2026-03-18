@@ -29,7 +29,15 @@ router.post('/api/projects/save', async({ request, user }) => {
         const body = await request.json();
         const project = body?.project;
 
-        if(!project?.id || !project?.sourceImage) return jsonError(400, 'Invalid project: missing id or sourceImage')
+        if(!project?.id || !project?.sourceImage) {
+            return jsonError(400, 'Invalid project: missing id or sourceImage', {
+                missing: {
+                    id: !project?.id,
+                    sourceImage: !project?.sourceImage,
+                },
+                receivedKeys: project && typeof project === 'object' ? Object.keys(project) : null,
+            })
+        }
 
         const payload = {
             ...project,
