@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import Upload from '@/components/Upload'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
-import { createProject, getProjects } from '@/lib/puter.action'
+import { createProject, getProjects, deleteProject } from '@/lib/puter.action'
 
 export function meta(){
   return [
@@ -66,16 +66,14 @@ export default function Home() {
   useEffect(() => {
     const fetchedProjects = async () => {
       const items = await getProjects()
-      // ✅ Merge: don't overwrite projects that already have renderedImage in local state
-      setProject(prev => {
-        if (prev.length === 0) return items
-        // Replace local items with server versions (server has the rendered image)
-        const serverMap = new Map(items.map(p => [p.id, p]))
-        const merged = prev.map(p => serverMap.get(p.id) ?? p)
-        // Add any server items not in local state
-        items.forEach(p => { if (!merged.find(m => m.id === p.id)) merged.push(p) })
-        return merged
-      })
+  
+      // ✅ Auto-delete unrendered projects silently
+      const unrendered = items.filter(p => !p.renderedImage)
+      await Promise.all(unrendered.map(p => deleteProject({ id: p.id })))
+  
+      // ✅ Only keep rendered ones
+      const rendered = items.filter(p => !!p.renderedImage)
+      setProject(rendered)
     }
     fetchedProjects()
   }, [])
@@ -142,7 +140,7 @@ export default function Home() {
     <div className="preview">
       <img src={renderedImage || sourceImage} alt="Project" />
       <div className="badge">
-        <span>{renderedImage ? 'Rendered' : 'Processing'}</span>  {/* ✅ better badge */}
+        <span>{renderedImage ? 'Community' : 'Processing'}</span>  {/* ✅ better badge */}
       </div>
     </div>
     <div className="card-body">
