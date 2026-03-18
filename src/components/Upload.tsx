@@ -26,19 +26,19 @@ const Upload: React.FC<UploadProps> = ({ onComplete }) => {
 
   useEffect(() => {
     // Rehydrate any previously uploaded Base64 data on refresh/reload
-    try {
-      const stored = window.sessionStorage.getItem(UPLOAD_BASE64_STORAGE_KEY)
-      if (stored && onComplete) {
-        onComplete(stored)
-      }
-    } catch {
-      // ignore storage errors
-    }
+    // try {
+    //   const stored = window.sessionStorage.getItem(UPLOAD_BASE64_STORAGE_KEY)
+    //   if (stored && onComplete) {
+    //     onComplete(stored)
+    //   }
+    // } catch {
+    //   // ignore storage errors
+    // }
 
     return () => {
       clearProgressInterval()
     }
-  }, [onComplete])
+  }, [])
 
   const processFile = (selectedFile: File) => {
     if (!isSignedIn) return
@@ -55,12 +55,12 @@ const Upload: React.FC<UploadProps> = ({ onComplete }) => {
       const result = reader.result
       const base64 = result.includes('base64,') ? result.split('base64,')[1] : result
 
-      // Persist Base64 so it survives page refresh/reload
-      try {
-        window.sessionStorage.setItem(UPLOAD_BASE64_STORAGE_KEY, base64)
-      } catch {
-        // ignore storage errors
-      }
+    //   // Persist Base64 so it survives page refresh/reload
+    //   try {
+    //     window.sessionStorage.setItem(UPLOAD_BASE64_STORAGE_KEY, base64)
+    //   } catch {
+    //     // ignore storage errors
+    //   }
 
       let currentProgress = 0
 

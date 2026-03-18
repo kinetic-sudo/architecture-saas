@@ -40,18 +40,17 @@ import {
     StoreHostedImageParams): Promise<HostedAsset | null> => {
     if (!hosting || !url) return null
   
-    // Already a hosted URL — nothing to upload
-    if (url.startsWith('http')) return { url }
+    // ✅ Already a hosted URL — nothing to upload
+    if (url.startsWith('http://') || url.startsWith('https://')) return { url }
   
     try {
       let resolved: { blob: Blob; contentType: string } | null = null
   
       if (label === 'rendered') {
-        // rendered images may be external URLs — convert to PNG blob
         const blob = await imageUrlToPngBlob(url)
         resolved = blob ? { blob, contentType: 'image/png' } : null
       } else {
-        // source images come in as data URLs from FileReader
+        // source images come as data URLs from FileReader
         resolved = dataUrlToBlob(url)
       }
   

@@ -7,8 +7,13 @@ export const signIn = async () => p().auth.signIn()
 export const signOut = async () => { p().auth.signOut(); return true }
 export const getCurrentUser = async () => p().auth.getUser()
 
-const toDataUrl = (base64: string, mime = 'image/jpeg') =>
-  base64.startsWith('data:') ? base64 : `data:${mime};base64,${base64}`
+const toDataUrl = (base64: string, mime = 'image/jpeg') => {
+  // ✅ Already a hosted URL or data URL — return as-is
+  if (base64.startsWith('http://') || base64.startsWith('https://') || base64.startsWith('data:')) {
+    return base64
+  }
+  return `data:${mime};base64,${base64}`
+}
 
 export const createProject = async ({ item, visibility = "private" }: CreateProjectParams): Promise<DesignItem | null | undefined> => {
   if(!PUTER_WORKER_URL) {
@@ -39,14 +44,22 @@ export const createProject = async ({ item, visibility = "private" }: CreateProj
       renderedImage: hostedRender?.url ?? undefined,
     }
 
+    console.log('📦 Sending payload to worker:', {
+      id: payload.id,
+      sourceImage: payload.sourceImage?.substring(0, 50),
+      hasRendered: !!payload.renderedImage,
+      allKeys: Object.keys(payload)
+    })
+
     const response = await p().workers.exec(`${PUTER_WORKER_URL}/api/projects/save`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json', 
-        body: JSON.stringify({
-        project: payload, visibility
-      })}
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ project: payload, visibility }),
     });
+
+    
 
     if (!response.ok) {
       console.error('failed to save the project', await response.text());
@@ -81,8 +94,8 @@ export const getProjects = async() => {
           return []
         }
 
-        const data = (await response.json() as {project?: DesignItem[] | null})
-        return Array.isArray(data?.project) ? data?.project : []
+        const data = (await response.json() as {projects?: DesignItem[] | null})
+        return Array.isArray(data?.projects) ? data?.projects : []
       } catch (e) {
         console.log('failed to get project for signing in', e)
         return []
