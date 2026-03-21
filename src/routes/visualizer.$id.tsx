@@ -20,6 +20,43 @@ const VisualizerId = () => {
   const [currentImage, setCurrentImage] = useState<string | null>(null)
 
   const handleBack = () => navigate('/')
+  const handleExport = async () => {
+    if (!currentImage) return
+
+    const fileBase = (project?.name || `project-${id || 'render'}`)
+      .trim()
+      .replace(/[^a-z0-9-_]+/gi, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+
+    const fileName = `${fileBase || 'render'}.png`
+
+    try {
+      const response = await fetch(currentImage)
+      if (!response.ok) throw new Error('Failed to fetch rendered image')
+
+      const blob = await response.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = blobUrl
+      link.download = fileName
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(blobUrl)
+    } catch (error) {
+      // Fallback for sources that block fetch/blob conversion.
+      const link = document.createElement('a')
+      link.href = currentImage
+      link.download = fileName
+      link.target = '_blank'
+      link.rel = 'noopener'
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      console.error('export failed, used fallback download:', error)
+    }
+  }
 
   const runGeneration = async (item: DesignItem) => {
     if (!id || !item.sourceImage ) return;
@@ -121,7 +158,7 @@ const VisualizerId = () => {
                 <div className="panel-actions">
                     <Button
                      size='sm'
-                     onClick={() => {}}
+                     onClick={handleExport}
                      className='export'
                      disabled={!currentImage}
                     > 
@@ -178,7 +215,7 @@ const VisualizerId = () => {
                             <ReactCompareSliderImage src={project?.sourceImage} alt='before' className='compare-img'/>
                         }
                         itemTwo =  {
-                            <ReactCompareSliderImage src={currentImage || project?.renderedImage} alt='after' className='compare-img'/>
+                            <ReactCompareSliderImage src={currentImage} alt='after' className='compare-img'/>
                         }
                         />
                     ) : (
